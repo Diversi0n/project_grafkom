@@ -192,12 +192,43 @@ function teleportPlayerIfOob() {
 
 const loader = new GLTFLoader();
 
-let road, car, krustykrab, mrkrab, plankton, squid, patrick, rumah_spongebob, chum_bucket, rumah_patrick, rumah_squidward, tiang_krustykrab, sun, moon;
+let road, car, krustykrab, building1,building2, sun, moon;
 let carCapsule;
 let mixer_squidward, mixer_mrkrab, mixer_patrick, mixer_plankton;
 let rumahnpc = [];
 let lamp = [];
 let lampCollider = [];
+
+//Building 1================
+loader.load( '/Building/venice_building.glb', function ( gltf ) {
+    building1 = gltf.scene;
+    building1.position.set(-25, -5, -40);
+    building1.scale.set(3.5, 3.5, 3.5);
+    building1.rotation.set(0, -0.8, 0);
+    building1.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+	scene.add( building1 );
+    worldOctree.fromGraphNode( building1 );
+});
+//Building 2================
+loader.load( '/Building/venice_building.glb', function ( gltf ) {
+    building2 = gltf.scene;
+    building2.position.set(0, -5, -40);
+    building2.scale.set(3.5, 3.5, 3.5);
+    building2.rotation.set(0, 0, 0);
+    building2.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+	scene.add( building2 );
+    worldOctree.fromGraphNode( building2 );
+});
 
 // SUN
 loader.load('/sun/sun.glb', function (gltf) {
@@ -237,8 +268,6 @@ floorMesh.rotation.x = - Math.PI / 2;
 floorMesh.receiveShadow = true;
 floorMesh.castShadow = true;
 scene.add(floorMesh);
-
-worldOctree.fromGraphNode( floorMesh )
 
 worldOctree.fromGraphNode(floorMesh);
 
