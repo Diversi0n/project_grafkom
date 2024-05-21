@@ -41,15 +41,15 @@ const playerDirection = new THREE.Vector3();
 
 let playerOnFloor = false;
 let mouseTime = 0;
-let knife;
 const keyStates = {};
+
+let knife, kar98k;
+let currentWeapon = 'knife';
 
 const loader = new GLTFLoader();
 loader.load('/Knife/karambit.glb', (gltf) => {
     knife = gltf.scene;
-
     knife.scale.set(0.1, 0.1, 0.1);
-
     knife.position.set(0.5, -0.5, -1);
     knife.rotation.set(4.5, Math.PI, -21);
 
@@ -69,8 +69,37 @@ loader.load('/Knife/karambit.glb', (gltf) => {
     console.error('Error loading knife:', error);
 });
 
+loader.load('/Gun/kar98k.glb', (gltf) => {
+    kar98k = gltf.scene;
+    kar98k.scale.set(0.4, 0.4, 0.4);
+    kar98k.position.set(0.5, -0.5, -1);
+    kar98k.rotation.set(0, Math.PI / 2, 0);
+
+    kar98k.userData.initialPosition = kar98k.position.clone();
+    kar98k.userData.initialRotation = kar98k.rotation.clone();
+
+    kar98k.traverse((node) => {
+        if (node.isMesh) {
+            if (node.material.map) {
+                node.material.map.encoding = THREE.sRGBEncoding;
+            }
+            node.material.needsUpdate = true;
+        }
+    });
+
+    camera.add(kar98k);
+    kar98k.visible = false; // Initially hide the gun
+}, undefined, (error) => {
+    console.error('Error loading gun:', error);
+});
+
+
 document.addEventListener('keydown', (event) => {
     keyStates[event.code] = true;
+
+    if (event.code === 'KeyE' && !isWeaponSwitching) {
+        toggleWeapon();
+    }
 });
 
 document.addEventListener('keyup', (event) => {
@@ -299,7 +328,7 @@ renderer.toneMappingExposure = 1;
 scene.background = new THREE.Color(0xa0a0a0);
 
 // LIGHTING
-const ambientLight = new THREE.AmbientLight(0x404040);
+const ambientLight = new THREE.AmbientLight(0x404040, 1.5);
 scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -313,6 +342,7 @@ scene.add(directionalLight);
 let isSpinning = false;
 let spinStartTime = 0;
 const spinDuration = 500;
+let isWeaponSwitching = false;
 
 function startSpin() {
     if (!isSpinning) {
@@ -327,12 +357,21 @@ function handleSpin() {
         if (elapsedTime < spinDuration) {
             const spinAngle = (elapsedTime / spinDuration) * Math.PI * 2;
             const twistAngle = Math.sin((elapsedTime / spinDuration) * Math.PI * 4) * 0.2;
-
-            knife.rotation.y = spinAngle;
-            knife.rotation.z = twistAngle;
+            const spinKar = (elapsedTime / spinDuration) * Math.PI * 2;
+            if (currentWeapon === 'knife') {
+                knife.rotation.y = spinAngle;
+                knife.rotation.z = twistAngle;
+            } else {
+                kar98k.rotation.x = spinKar;
+            }
         } else {
             isSpinning = false;
-            knife.rotation.copy(knife.userData.initialRotation);
+            if (currentWeapon === 'knife') {
+                knife.rotation.copy(knife.userData.initialRotation);
+            } else {
+                kar98k.rotation.copy(kar98k.userData.initialRotation);
+            }
+            isWeaponSwitching = false; // Allow weapon switching again
         }
     }
 }
@@ -340,6 +379,28 @@ function handleSpin() {
 function preventKnifeClipping() {
     if (knife.position.y <= -1.5) {
         knife.position.copy(knife.userData.initialPosition);
+    }
+}
+
+function preventGunClipping() {
+    if (kar98k.position.y <= -1.5) {
+        kar98k.position.copy(kar98k.userData.initialPosition);
+    }
+}
+
+function toggleWeapon() {
+    if (knife && kar98k && !isWeaponSwitching) {
+        isWeaponSwitching = true;
+        startSpin(); // Start the spin animation
+        if (currentWeapon === 'knife') {
+            knife.visible = false;
+            kar98k.visible = true;
+            currentWeapon = 'kar98k';
+        } else {
+            knife.visible = true;
+            kar98k.visible = false;
+            currentWeapon = 'knife';
+        }
     }
 }
 
@@ -356,6 +417,7 @@ function animate() {
 
     handleSpin();
     preventKnifeClipping();
+    preventGunClipping();  // Add this line
 
     renderer.render(scene, camera);
 }
