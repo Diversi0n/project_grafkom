@@ -29,7 +29,7 @@ function onWindowResize() {
 
 const clock = new THREE.Clock();
 const GRAVITY = 30;
-const STEPS_PER_FRAME = 1;
+const STEPS_PER_FRAME = 2;  // Increase steps per frame for smoother physics
 
 const worldOctree = new Octree();
 let carOctree = new Octree();
@@ -47,19 +47,26 @@ const keyStates = {};
 const loader = new GLTFLoader();
 loader.load('/Knife/karambit.glb', (gltf) => {
     knife = gltf.scene;
-    console.log('Knife loaded:', knife);  // Log knife object
 
-    knife.scale.set(0.1, 0.1, 0.1); // Adjust the scale if needed
+    knife.scale.set(0.1, 0.1, 0.1);
 
-    // Adjust the position and rotation of the knife to align with the camera view
-    knife.position.set(0.5, -0.5, -1); // Adjust these values as necessary
-    knife.rotation.set(4.5, Math.PI, -21); // Adjust the rotation if necessary
+    knife.position.set(0.5, -0.5, -1);
+    knife.rotation.set(4.5, Math.PI, -21);
 
-    // Add the knife to the camera
+    knife.userData.initialPosition = knife.position.clone();
+    knife.userData.initialRotation = knife.rotation.clone();
+
+    knife.traverse((node) => {
+        if (node.isMesh) {
+            node.renderOrder = 9999;
+            node.material.depthTest = false;
+        }
+    });
+
     camera.add(knife);
-    scene.add(camera);  // Ensure the camera is added to the scene
+    scene.add(camera);
 }, undefined, (error) => {
-    console.error('Error loading knife:', error);  // Log errors if any
+    console.error('Error loading knife:', error);
 });
 
 document.addEventListener('keydown', (event) => {
@@ -85,9 +92,9 @@ document.addEventListener('pointerlockchange', () => {
 });
 
 function onDocumentMouseDown(event) {
-    if (event.button === 0) { // Left mouse button
+    if (event.button === 0) {
         mouseTime = performance.now();
-        startSpin(); // Ensure spin is started when left mouse button is clicked
+        startSpin();
     }
 }
 
@@ -160,7 +167,6 @@ function getSideVector() {
 function controls(deltaTime) {
     const speedDelta = deltaTime * (playerOnFloor ? 25 : 8);
 
-    // Check key states for movement
     if (keyStates['KeyW']) {
         playerVelocity.add(getForwardVector().multiplyScalar(speedDelta));
     }
@@ -177,7 +183,6 @@ function controls(deltaTime) {
         playerVelocity.add(getSideVector().multiplyScalar(speedDelta));
     }
 
-    // Check for jump
     if (playerOnFloor) {
         if (keyStates['Space']) {
             playerVelocity.y = 10;
@@ -195,7 +200,7 @@ function teleportPlayerIfOob() {
     }
 }
 
-let road, car, krustykrab, building1, building2, sun, moon;
+let road, car, krustykrab, building1, building2, building3, sun, moon;
 let rumahnpc = [];
 let lamp = [];
 let lampCollider = [];
@@ -234,39 +239,37 @@ loader.load('/Building/building1.glb', function (gltf) {
 
 // Building 3================
 loader.load('/Building/building2.glb', function (gltf) {
-    building2 = gltf.scene;
-    building2.position.set(0, 0, -40);
-    building2.scale.set(3.5, 3.5, 3.5);
-    building2.rotation.set(0, 0, 0);
-    building2.traverse((node) => {
+    building3 = gltf.scene;
+    building3.position.set(0, 0, -40);
+    building3.scale.set(3.5, 3.5, 3.5);
+    building3.rotation.set(0, 0, 0);
+    building3.traverse((node) => {
         if (node.isMesh) {
             node.castShadow = true;
             node.receiveShadow = true;
         }
     });
-    scene.add(building2);
-    worldOctree.fromGraphNode(building2);
+    scene.add(building3);
+    worldOctree.fromGraphNode(building3);
 });
 
 // FLOOR======================
-const floorSize = 100; // Size of the visible floor
-const tileSize = 10; // Size of each tile
-const numTiles = Math.ceil(floorSize / tileSize); // Number of tiles per side
+const floorSize = 100;
+const tileSize = 10;
+const numTiles = Math.ceil(floorSize / tileSize);
 
-// Create a larger plane to tile the floor texture
 const floorGeometry = new THREE.PlaneGeometry(tileSize * numTiles, tileSize * numTiles, numTiles, numTiles);
 const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: true });
 
-// Apply a repeating texture to the floor material
 const floorLoader = new THREE.TextureLoader();
-const floorTexture = floorLoader.load('/Floor/tile.jpg'); // Replace 'floor_texture.jpg' with the path to your desired floor texture
+const floorTexture = floorLoader.load('/Floor/tile.jpg');
 floorTexture.wrapS = THREE.RepeatWrapping;
 floorTexture.wrapT = THREE.RepeatWrapping;
 floorTexture.repeat.set(numTiles, numTiles);
 floorMaterial.map = floorTexture;
 
 const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
-floorMesh.rotation.x = - Math.PI / 2;
+floorMesh.rotation.x = -Math.PI / 2;
 floorMesh.receiveShadow = true;
 floorMesh.castShadow = true;
 scene.add(floorMesh);
@@ -302,41 +305,41 @@ scene.add(ambientLight);
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(5, 10, 7.5);
 directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.width = 1024;
-directionalLight.shadow.mapSize.height = 1024;
+directionalLight.shadow.mapSize.width = 512;  // Reduced shadow map size
+directionalLight.shadow.mapSize.height = 512; // Reduced shadow map size
 scene.add(directionalLight);
 
 // Animation variables
 let isSpinning = false;
 let spinStartTime = 0;
-const spinDuration = 500; // Duration of the spin in milliseconds
+const spinDuration = 500;
 
-// Function to start the knife spin animation
 function startSpin() {
     if (!isSpinning) {
-        console.log('Starting knife spin');
         isSpinning = true;
         spinStartTime = performance.now();
     }
 }
 
-// Function to handle the knife spin animation
 function handleSpin() {
     if (isSpinning) {
         const elapsedTime = performance.now() - spinStartTime;
         if (elapsedTime < spinDuration) {
-            // Calculate the rotation angle based on elapsed time
-            const spinAngle = (elapsedTime / spinDuration) * Math.PI * 2; // Full spin
-            const twistAngle = Math.sin((elapsedTime / spinDuration) * Math.PI * 4) * 0.2; // Twist angle
+            const spinAngle = (elapsedTime / spinDuration) * Math.PI * 2;
+            const twistAngle = Math.sin((elapsedTime / spinDuration) * Math.PI * 4) * 0.2;
 
             knife.rotation.y = spinAngle;
             knife.rotation.z = twistAngle;
         } else {
-            // End the spin
             isSpinning = false;
-            knife.rotation.y = 0; // Reset rotation to the original position
-            knife.rotation.z = 0; // Reset twist to the original position
+            knife.rotation.copy(knife.userData.initialRotation);
         }
+    }
+}
+
+function preventKnifeClipping() {
+    if (knife.position.y <= -1.5) {
+        knife.position.copy(knife.userData.initialPosition);
     }
 }
 
@@ -351,8 +354,8 @@ function animate() {
         teleportPlayerIfOob();
     }
 
-    // Handle knife spin animation
     handleSpin();
+    preventKnifeClipping();
 
     renderer.render(scene, camera);
 }
