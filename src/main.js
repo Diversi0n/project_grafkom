@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Octree } from 'three/addons/math/Octree.js';
 import { Capsule } from 'three/addons/math/Capsule.js';
 
-//INIT===============================================
+// INIT===============================================
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -41,8 +41,26 @@ const playerDirection = new THREE.Vector3();
 
 let playerOnFloor = false;
 let mouseTime = 0;
-
+let knife;
 const keyStates = {};
+
+const loader = new GLTFLoader();
+loader.load('/Knife/karambit.glb', (gltf) => {
+    knife = gltf.scene;
+    console.log('Knife loaded:', knife);  // Log knife object
+
+    knife.scale.set(0.1, 0.1, 0.1); // Adjust the scale if needed
+
+    // Adjust the position and rotation of the knife to align with the camera view
+    knife.position.set(0.5, -0.5, -1); // Adjust these values as necessary
+    knife.rotation.set(4.5, Math.PI, -21); // Adjust the rotation if necessary
+
+    // Add the knife to the camera
+    camera.add(knife);
+    scene.add(camera);  // Ensure the camera is added to the scene
+}, undefined, (error) => {
+    console.error('Error loading knife:', error);  // Log errors if any
+});
 
 document.addEventListener('keydown', (event) => {
     keyStates[event.code] = true;
@@ -52,10 +70,26 @@ document.addEventListener('keyup', (event) => {
     keyStates[event.code] = false;
 });
 
-container.addEventListener('mousedown', () => {
-    document.body.requestPointerLock();
-    mouseTime = performance.now();
+container.addEventListener('click', (event) => {
+    if (document.pointerLockElement !== document.body) {
+        document.body.requestPointerLock();
+    }
 });
+
+document.addEventListener('pointerlockchange', () => {
+    if (document.pointerLockElement === document.body) {
+        document.addEventListener('mousedown', onDocumentMouseDown);
+    } else {
+        document.removeEventListener('mousedown', onDocumentMouseDown);
+    }
+});
+
+function onDocumentMouseDown(event) {
+    if (event.button === 0) { // Left mouse button
+        mouseTime = performance.now();
+        startSpin(); // Ensure spin is started when left mouse button is clicked
+    }
+}
 
 document.body.addEventListener('mousemove', (event) => {
     if (document.pointerLockElement === document.body) {
@@ -90,10 +124,6 @@ function getPlayerDirection(objectCollider, playerCollider) {
     return carCenter.sub(playerCenter).normalize();
 }
 
-let automaticRiding = false;
-let ridingCar = false;
-let ridingTimer = 0;
-
 function updatePlayer(deltaTime) {
     let damping = Math.exp(-4 * deltaTime) - 1;
 
@@ -109,34 +139,7 @@ function updatePlayer(deltaTime) {
 
     playerCollisions();
 
-    if (!ridingCar) camera.position.copy(playerCollider.end);
-
-    if (ridingTimer != 0) {
-        ridingTimer++;
-        if (ridingTimer == 100) ridingTimer = 0;
-    }
-
-    if (keyStates['KeyT'] && ridingTimer == 0) {
-        automaticRiding = !automaticRiding;
-        ridingTimer++;
-        if (automaticRiding) {
-            carOctree = new Octree();
-        } else {
-            carOctree = new Octree();
-            carOctree.fromGraphNode(car);
-        }
-    }
-
-    if ((keyStates['KeyF'] || keyStates['Space']) && ridingCar && ridingTimer == 0) {
-        teleportPlayerToRightSide(car, 2)
-        carOctree = new Octree();
-        carOctree.fromGraphNode(car);
-        ridingCar = false;
-        ridingTimer++;
-    } else if (carCapsule && carCapsule.collider && isPlayerAroundObject(carCapsule.collider, playerCollider, 6) && keyStates['KeyF'] && !ridingCar && ridingTimer == 0) {
-        ridingCar = true;
-        ridingTimer++;
-    }
+    camera.position.copy(playerCollider.end);
 }
 
 function getForwardVector() {
@@ -157,6 +160,7 @@ function getSideVector() {
 function controls(deltaTime) {
     const speedDelta = deltaTime * (playerOnFloor ? 25 : 8);
 
+    // Check key states for movement
     if (keyStates['KeyW']) {
         playerVelocity.add(getForwardVector().multiplyScalar(speedDelta));
     }
@@ -173,6 +177,7 @@ function controls(deltaTime) {
         playerVelocity.add(getSideVector().multiplyScalar(speedDelta));
     }
 
+    // Check for jump
     if (playerOnFloor) {
         if (keyStates['Space']) {
             playerVelocity.y = 10;
@@ -190,19 +195,15 @@ function teleportPlayerIfOob() {
     }
 }
 
-const loader = new GLTFLoader();
-
-let road, car, krustykrab, building1,building2, sun, moon;
-let carCapsule;
-let mixer_squidward, mixer_mrkrab, mixer_patrick, mixer_plankton;
+let road, car, krustykrab, building1, building2, sun, moon;
 let rumahnpc = [];
 let lamp = [];
 let lampCollider = [];
 
-//Building 1================
-loader.load( '/Building/venice_building.glb', function ( gltf ) {
+// Building 1================
+loader.load('/Building/building1.glb', function (gltf) {
     building1 = gltf.scene;
-    building1.position.set(-25, -5, -40);
+    building1.position.set(-25, 0, -40);
     building1.scale.set(3.5, 3.5, 3.5);
     building1.rotation.set(0, -0.8, 0);
     building1.traverse((node) => {
@@ -211,13 +212,14 @@ loader.load( '/Building/venice_building.glb', function ( gltf ) {
             node.receiveShadow = true;
         }
     });
-	scene.add( building1 );
-    worldOctree.fromGraphNode( building1 );
+    scene.add(building1);
+    worldOctree.fromGraphNode(building1);
 });
-//Building 2================
-loader.load( '/Building/venice_building.glb', function ( gltf ) {
+
+// Building 2================
+loader.load('/Building/building1.glb', function (gltf) {
     building2 = gltf.scene;
-    building2.position.set(0, -5, -40);
+    building2.position.set(-35, 0, -10);
     building2.scale.set(3.5, 3.5, 3.5);
     building2.rotation.set(0, 0, 0);
     building2.traverse((node) => {
@@ -226,28 +228,28 @@ loader.load( '/Building/venice_building.glb', function ( gltf ) {
             node.receiveShadow = true;
         }
     });
-	scene.add( building2 );
-    worldOctree.fromGraphNode( building2 );
+    scene.add(building2);
+    worldOctree.fromGraphNode(building2);
 });
 
-// SUN
-loader.load('/sun/sun.glb', function (gltf) {
-    sun = gltf.scene;
-    sun.position.set(350, 350, -10);
-    sun.scale.set(0.1, 0.1, 0.1);
-    scene.add(sun);
+// Building 3================
+loader.load('/Building/building2.glb', function (gltf) {
+    building2 = gltf.scene;
+    building2.position.set(0, 0, -40);
+    building2.scale.set(3.5, 3.5, 3.5);
+    building2.rotation.set(0, 0, 0);
+    building2.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+    scene.add(building2);
+    worldOctree.fromGraphNode(building2);
 });
 
-// MOON
-loader.load('/moon/moon.glb', function (gltf) {
-    moon = gltf.scene;
-    moon.position.set(-350, -350, -10);
-    scene.add(moon);
-});
-
-// FLOOR
-//FLOOR======================
-const floorSize = 200; // Size of the visible floor
+// FLOOR======================
+const floorSize = 100; // Size of the visible floor
 const tileSize = 10; // Size of each tile
 const numTiles = Math.ceil(floorSize / tileSize); // Number of tiles per side
 
@@ -304,7 +306,39 @@ directionalLight.shadow.mapSize.width = 1024;
 directionalLight.shadow.mapSize.height = 1024;
 scene.add(directionalLight);
 
-let frameCount = 0;
+// Animation variables
+let isSpinning = false;
+let spinStartTime = 0;
+const spinDuration = 500; // Duration of the spin in milliseconds
+
+// Function to start the knife spin animation
+function startSpin() {
+    if (!isSpinning) {
+        console.log('Starting knife spin');
+        isSpinning = true;
+        spinStartTime = performance.now();
+    }
+}
+
+// Function to handle the knife spin animation
+function handleSpin() {
+    if (isSpinning) {
+        const elapsedTime = performance.now() - spinStartTime;
+        if (elapsedTime < spinDuration) {
+            // Calculate the rotation angle based on elapsed time
+            const spinAngle = (elapsedTime / spinDuration) * Math.PI * 2; // Full spin
+            const twistAngle = Math.sin((elapsedTime / spinDuration) * Math.PI * 4) * 0.2; // Twist angle
+
+            knife.rotation.y = spinAngle;
+            knife.rotation.z = twistAngle;
+        } else {
+            // End the spin
+            isSpinning = false;
+            knife.rotation.y = 0; // Reset rotation to the original position
+            knife.rotation.z = 0; // Reset twist to the original position
+        }
+    }
+}
 
 function animate() {
     requestAnimationFrame(animate);
@@ -316,6 +350,9 @@ function animate() {
         updatePlayer(deltaTime);
         teleportPlayerIfOob();
     }
+
+    // Handle knife spin animation
+    handleSpin();
 
     renderer.render(scene, camera);
 }
