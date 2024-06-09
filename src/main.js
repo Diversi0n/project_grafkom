@@ -176,6 +176,7 @@ function updatePlayer(deltaTime) {
     playerCollisions();
 
     camera.position.copy(playerCollider.end);
+    camera.position.y += 0.6;
 }
 
 function getForwardVector() {
@@ -229,7 +230,8 @@ function teleportPlayerIfOob() {
     }
 }
 
-let road, car, krustykrab, building1, building2, building3, sun, moon;
+let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4;
+let mixer_chamber;
 let rumahnpc = [];
 let lamp = [];
 let lampCollider = [];
@@ -237,9 +239,9 @@ let lampCollider = [];
 // Building 1================
 loader.load('/Building/building1.glb', function (gltf) {
     building1 = gltf.scene;
-    building1.position.set(-25, 0, -40);
-    building1.scale.set(3.5, 3.5, 3.5);
-    building1.rotation.set(0, -0.8, 0);
+    building1.position.set(-16, 0, -13);
+    building1.scale.set(2, 2, 2);
+    building1.rotation.set(0, 0, 0);
     building1.traverse((node) => {
         if (node.isMesh) {
             node.castShadow = true;
@@ -253,8 +255,8 @@ loader.load('/Building/building1.glb', function (gltf) {
 // Building 2================
 loader.load('/Building/building1.glb', function (gltf) {
     building2 = gltf.scene;
-    building2.position.set(-35, 0, -10);
-    building2.scale.set(3.5, 3.5, 3.5);
+    building2.position.set(-16, 0, -5);
+    building2.scale.set(2, 2, 2);
     building2.rotation.set(0, 0, 0);
     building2.traverse((node) => {
         if (node.isMesh) {
@@ -269,8 +271,8 @@ loader.load('/Building/building1.glb', function (gltf) {
 // Building 3================
 loader.load('/Building/building2.glb', function (gltf) {
     building3 = gltf.scene;
-    building3.position.set(0, 0, -40);
-    building3.scale.set(3.5, 3.5, 3.5);
+    building3.position.set(-15.5, 0, -17);
+    building3.scale.set(2.1, 2.1, 2.1);
     building3.rotation.set(0, 0, 0);
     building3.traverse((node) => {
         if (node.isMesh) {
@@ -282,8 +284,116 @@ loader.load('/Building/building2.glb', function (gltf) {
     worldOctree.fromGraphNode(building3);
 });
 
+// Building 4================
+loader.load('/Building/house_valo.glb', function (gltf) {
+    building4 = gltf.scene;
+    building4.position.set(-16, -0.2, 15);
+    building4.scale.set(1, 1, 1);
+    building4.rotation.set(0, 0, 0);
+    building4.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+    scene.add(building4);
+    worldOctree.fromGraphNode(building4);
+});
+
+//longwall1 =========================
+loader.load( '/Wall/longwall.glb', function ( gltf ) {
+    longwall1 = gltf.scene;
+    longwall1.scale.set(2, 2, 2);
+    longwall1.rotation.set(0, 0, 0);
+    longwall1.position.set(-10, 0, -24.7);
+    longwall1.traverse((node) => {
+        if (node.isMesh) {
+          node.castShadow = true;
+          node.receiveShadow = true;
+        }
+    });
+
+	scene.add( longwall1 );
+    worldOctree.fromGraphNode( longwall1 )
+});
+
+//longwall2 =========================
+loader.load( '/Wall/longwall.glb', function ( gltf ) {
+    longwall2 = gltf.scene;
+    longwall2.scale.set(2, 2, 2);
+    longwall2.rotation.set(0, Math.PI / 2, 0);
+    longwall2.position.set(-24.5, 0, -6);
+    longwall2.traverse((node) => {
+        if (node.isMesh) {
+          node.castShadow = true;
+          node.receiveShadow = true;
+        }
+    });
+
+	scene.add( longwall2 );
+    worldOctree.fromGraphNode( longwall2 )
+});
+
+//longwall3 =========================
+loader.load( '/Wall/longwall.glb', function ( gltf ) {
+    longwall3 = gltf.scene;
+    longwall3.scale.set(2, 2, 2);
+    longwall3.rotation.set(0, 90 * (Math.PI / 180), 0);
+    longwall3.position.set(-24.3, 0, 6.3);
+    longwall3.traverse((node) => {
+        if (node.isMesh) {
+          node.castShadow = true;
+          node.receiveShadow = true;
+        }
+    });
+
+	scene.add( longwall3 );
+    worldOctree.fromGraphNode( longwall3 )
+});
+
+//longwall1 =========================
+loader.load( '/Wall/longwall.glb', function ( gltf ) {
+    longwall4 = gltf.scene;
+    longwall4.scale.set(2, 2, 2);
+    longwall4.rotation.set(0, -1 * (Math.PI / 180), 0);
+    longwall4.position.set(-10, 0, 25);
+    longwall4.traverse((node) => {
+        if (node.isMesh) {
+          node.castShadow = true;
+          node.receiveShadow = true;
+        }
+    });
+
+	scene.add( longwall4 );
+    worldOctree.fromGraphNode( longwall4 )
+});
+
+//chamber =========================
+loader.load( '/Agent/cham.glb', function ( gltf ) {
+    chamber = gltf.scene;
+    chamber.scale.set(1.1, 1.1, 1.1);
+    chamber.rotation.set(0, 0, 0);
+    chamber.position.set(0, 0, -20);
+    chamber.traverse((node) => {
+        if (node.isMesh) {
+          node.castShadow = true;
+          node.receiveShadow = true;
+        }
+    });
+
+	scene.add( chamber );
+    worldOctree.fromGraphNode( chamber )
+
+    // Create an AnimationMixer and pass in the model's animations
+    mixer_chamber = new THREE.AnimationMixer(chamber);
+    console.log('GLTF Animations: ', gltf.animations[0]);
+    // Play the first animation in the model's animation array
+    const action = mixer_chamber.clipAction(gltf.animations[0]);
+    action.play();
+});
+
 // FLOOR======================
-const floorSize = 100;
+const floorSize = 50;
 const tileSize = 10;
 const numTiles = Math.ceil(floorSize / tileSize);
 
@@ -418,6 +528,11 @@ function animate() {
     handleSpin();
     preventKnifeClipping();
     preventGunClipping();  // Add this line
+
+    // Update the mixer if it's defined
+    if (mixer_chamber) {
+        mixer_chamber.update(deltaTime);
+    }
 
     renderer.render(scene, camera);
 }
