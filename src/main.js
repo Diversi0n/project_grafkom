@@ -231,7 +231,8 @@ function teleportPlayerIfOob() {
     }
 }
 
-let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4, longwall5, longwall6, longwall7, longwall8, lever, table, rotatingdoor;
+let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4, longwall5, longwall6, longwall7, longwall8, lever, table, rotatingdoor, doorframe;
+
 let mixer_chamber;
 let doorBoundingBox;
 
@@ -283,50 +284,6 @@ loader.load('/Building/building2.glb', function (gltf) {
     worldOctree.fromGraphNode(building3);
 });
 
-// Rotating Door================
-loader.load('/Wall/rotatingdoor.glb', function (gltf) {
-    rotatingdoor = gltf.scene;
-    rotatingdoor.scale.set(1, 1, 1);
-    rotatingdoor.rotation.set(0, Math.PI / 2, 0);
-    rotatingdoor.position.set(10, 0, -7);
-    scene.add(rotatingdoor);
-    
-});
-
-// Table
-loader.load( '/Lever/table.glb', function ( gltf ) {
-    table = gltf.scene;
-    table.scale.set(0.02, 0.02, 0.02);
-    table.rotation.set(0, Math.PI / 2, 0);
-    table.position.set(3, -0.845, -4);
-    // longwall1.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
-	scene.add( table );
-    worldOctree.fromGraphNode( table )
-});
-
-// Table
-loader.load( '/Lever/lever.glb', function ( gltf ) {
-    lever = gltf.scene;
-    lever.scale.set(1, 1, 1);
-    lever.rotation.set(0, Math.PI / 2, 0);
-    lever.position.set(3, 0.7, -4);
-    // longwall1.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
-	scene.add( lever );
-    worldOctree.fromGraphNode( lever )
-});
-
 // Building 4================
 loader.load('/Building/house_valo.glb', function (gltf) {
     building4 = gltf.scene;
@@ -343,19 +300,55 @@ loader.load('/Building/house_valo.glb', function (gltf) {
     worldOctree.fromGraphNode(building4);
 });
 
+// Rotating Door================
+loader.load('/Wall/rotatingdoor.glb', function (gltf) {
+    rotatingdoor = gltf.scene;
+    rotatingdoor.scale.set(3, 3, 3);
+    rotatingdoor.rotation.set(0, Math.PI / 2, 0);
+    rotatingdoor.position.set(10, 0, -7);
+    scene.add(rotatingdoor);
+});
+
+// DoorFrame ================
+loader.load('/Wall/doorframe.glb', function (gltf) {
+    doorframe = gltf.scene;
+    doorframe.scale.set(3, 2.8, 3.5);
+    doorframe.rotation.set(0, Math.PI + (Math.PI / 2), 0);
+    doorframe.position.set(8, -2, -4);
+    worldOctree.fromGraphNode( doorframe )
+    scene.add(doorframe);
+});
+
+// Table
+loader.load( '/Lever/table.glb', function ( gltf ) {
+    table = gltf.scene;
+    table.scale.set(0.02, 0.02, 0.02);
+    table.rotation.set(0, Math.PI / 2, 0);
+    table.position.set(3, -0.845, -4);
+    
+	scene.add( table );
+    worldOctree.fromGraphNode( table )
+});
+
+// Table
+loader.load( '/Lever/lever.glb', function ( gltf ) {
+    lever = gltf.scene;
+    lever.scale.set(1, 1, 1);
+    lever.rotation.set(0, Math.PI / 2, 0);
+    lever.position.set(3, 0.7, -4);
+
+	scene.add( lever );
+    worldOctree.fromGraphNode( lever )
+});
+
+
+
 // longwall1 =========================
 loader.load( '/Wall/longwall.glb', function ( gltf ) {
     longwall1 = gltf.scene;
     longwall1.scale.set(2, 2, 2);
     longwall1.rotation.set(0, 0, 0);
     longwall1.position.set(-10, 0, -24.7);
-    // longwall1.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
 	scene.add( longwall1 );
     worldOctree.fromGraphNode( longwall1 )
 });
@@ -366,13 +359,6 @@ loader.load( '/Wall/longwall.glb', function ( gltf ) {
     longwall2.scale.set(2, 2, 2);
     longwall2.rotation.set(0, 90 * (Math.PI / 180), 0);
     longwall2.position.set(-24.5, 0, -6);
-    // longwall2.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
 	scene.add( longwall2 );
     worldOctree.fromGraphNode( longwall2 )
 });
@@ -383,13 +369,6 @@ loader.load( '/Wall/longwall.glb', function ( gltf ) {
     longwall3.scale.set(2, 2, 2);
     longwall3.rotation.set(0, 90 * (Math.PI / 180), 0);
     longwall3.position.set(-24.3, 0, 6.3);
-    // longwall3.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
 	scene.add( longwall3 );
     worldOctree.fromGraphNode( longwall3 )
 });
@@ -400,13 +379,6 @@ loader.load( '/Wall/longwall.glb', function ( gltf ) {
     longwall4.scale.set(2, 2, 2);
     longwall4.rotation.set(0, -1 * (Math.PI / 180), 0);
     longwall4.position.set(-10, 0, 25);
-    // longwall4.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
 	scene.add( longwall4 );
     worldOctree.fromGraphNode( longwall4 )
 });
@@ -519,15 +491,13 @@ const rotatingDoorSpeed = Math.PI / 4; // Rotating door speed (radians per secon
 let rotatingDoorAngle = 0;
 const rotatingDoorAxis = new THREE.Vector3(0, 1, 0);
 
-
-// Add this code inside loader for rotating door
-
+let isDoorOpen = false; // Status awal pintu (tertutup)
 
 // Function to rotate the door
 function rotateDoor() {
     if (!isDoorRotating) {
         isDoorRotating = true;
-        const targetAngle = rotatingDoorAngle + Math.PI / 2;
+        const targetAngle = isDoorOpen ? rotatingDoorAngle - Math.PI / 2 : rotatingDoorAngle + Math.PI / 2;
 
         const doorTween = new TWEEN.Tween({ angle: rotatingDoorAngle })
             .to({ angle: targetAngle }, (Math.PI / 2) / rotatingDoorSpeed * 1000)
@@ -539,11 +509,13 @@ function rotateDoor() {
             })
             .onComplete(() => {
                 isDoorRotating = false;
+                isDoorOpen = !isDoorOpen; // Ubah status pintu setelah animasi selesai
             });
 
         doorTween.start();
     }
 }
+
 
 const raycaster = new THREE.Raycaster();
 const rayDirection = new THREE.Vector3();
