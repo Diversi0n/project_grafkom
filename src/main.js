@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Octree } from 'three/addons/math/Octree.js';
 import { Capsule } from 'three/addons/math/Capsule.js';
+import TWEEN from '@tweenjs/tween.js';
 
 // INIT===============================================
 
@@ -29,10 +30,9 @@ function onWindowResize() {
 
 const clock = new THREE.Clock();
 const GRAVITY = 30;
-const STEPS_PER_FRAME = 2;  // Increase steps per frame for smoother physics
+const STEPS_PER_FRAME = 2;
 
 const worldOctree = new Octree();
-let carOctree = new Octree();
 
 const playerCollider = new Capsule(new THREE.Vector3(-9, 0.8, 5), new THREE.Vector3(-9, 1.2, 5), 0.8);
 
@@ -40,8 +40,9 @@ const playerVelocity = new THREE.Vector3();
 const playerDirection = new THREE.Vector3();
 
 let playerOnFloor = false;
-let mouseTime = 0;
 const keyStates = {};
+let mouseTime = 0;
+let isCollidingWithDoor = false;
 
 let knife, kar98k;
 let currentWeapon = 'knife';
@@ -93,47 +94,6 @@ loader.load('/Gun/kar98k.glb', (gltf) => {
     console.error('Error loading gun:', error);
 });
 
-let isLeverHighlighted = false;
-const leverMessage = document.getElementById('leverMessage');
-
-function checkLeverProximityAndOrientation() {
-    const leverPosition = new THREE.Vector3();
-    lever.getWorldPosition(leverPosition);
-    const playerPosition = new THREE.Vector3();
-    playerCollider.getCenter(playerPosition);
-
-    const distance = leverPosition.distanceTo(playerPosition);
-    const forwardVector = getForwardVector();
-    const directionToLever = leverPosition.clone().sub(playerPosition).normalize();
-
-    if (distance < 3 && forwardVector.dot(directionToLever) > 0.7) {
-        if (!isLeverHighlighted) {
-            highlightLever(true);
-            leverMessage.style.display = 'block';
-            isLeverHighlighted = true;
-        }
-    } else {
-        if (isLeverHighlighted) {
-            highlightLever(false);
-            leverMessage.style.display = 'none';
-            isLeverHighlighted = false;
-        }
-    }
-}
-
-function highlightLever(highlight) {
-    lever.traverse((node) => {
-        if (node.isMesh) {
-            if (highlight) {
-                node.originalColor = node.material.color.clone();
-                node.material.color.set(0xffffff);
-            } else {
-                node.material.color.copy(node.originalColor);
-            }
-        }
-    });
-}
-
 document.addEventListener('keydown', (event) => {
     keyStates[event.code] = true;
 
@@ -141,8 +101,8 @@ document.addEventListener('keydown', (event) => {
         toggleWeapon();
     }
 
-    if (event.code === 'KeyF' && isLeverHighlighted) {
-        console.log('Lever activated');
+    if (event.code === 'KeyF' && isLeverHighlighted && !isDoorRotating) {
+        rotateDoor();
     }
 });
 
@@ -180,7 +140,6 @@ document.body.addEventListener('mousemove', (event) => {
 
 function playerCollisions() {
     const result = worldOctree.capsuleIntersect(playerCollider);
-    const result2 = carOctree.capsuleIntersect(playerCollider);
 
     playerOnFloor = false;
 
@@ -191,17 +150,13 @@ function playerCollisions() {
             playerVelocity.addScaledVector(result.normal, -result.normal.dot(playerVelocity));
         }
 
-        playerCollider.translate(result.normal.multiplyScalar(result.depth));
+        // Check if player is colliding with the door
+        if (doorBoundingBox && doorBoundingBox.containsPoint(playerCollider.start)) {
+            playerVelocity.set(0, 0, 0);
+        } else {
+            playerCollider.translate(result.normal.multiplyScalar(result.depth));
+        }
     }
-
-    if (result2) playerCollider.translate(result2.normal.multiplyScalar(result2.depth));
-}
-
-function getPlayerDirection(objectCollider, playerCollider) {
-    const carCenter = objectCollider.getCenter(new THREE.Vector3());
-    const playerCenter = playerCollider.getCenter(new THREE.Vector3());
-
-    return carCenter.sub(playerCenter).normalize();
 }
 
 function updatePlayer(deltaTime) {
@@ -221,6 +176,7 @@ function updatePlayer(deltaTime) {
 
     camera.position.copy(playerCollider.end);
     camera.position.y += 0.6;
+    
 }
 
 function getForwardVector() {
@@ -237,8 +193,9 @@ function getSideVector() {
     playerDirection.cross(camera.up);
     return playerDirection;
 }
-
 function controls(deltaTime) {
+    if (isCollidingWithDoor) return;
+
     const speedDelta = deltaTime * (playerOnFloor ? 25 : 8);
 
     if (keyStates['KeyW']) {
@@ -276,9 +233,7 @@ function teleportPlayerIfOob() {
 
 let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4, lever, table, rotatingdoor;
 let mixer_chamber;
-let rumahnpc = [];
-let lamp = [];
-let lampCollider = [];
+let doorBoundingBox;
 
 // Building 1================
 loader.load('/Building/building1.glb', function (gltf) {
@@ -329,20 +284,13 @@ loader.load('/Building/building2.glb', function (gltf) {
 });
 
 // Rotating Door================
-loader.load( '/Wall/rotatingdoor.glb', function ( gltf ) {
+loader.load('/Wall/rotatingdoor.glb', function (gltf) {
     rotatingdoor = gltf.scene;
     rotatingdoor.scale.set(2, 2, 2);
     rotatingdoor.rotation.set(0, Math.PI / 2, 0);
     rotatingdoor.position.set(10, 0, -7);
-    // longwall1.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
-	scene.add( rotatingdoor );
-    worldOctree.fromGraphNode( rotatingdoor )
+    scene.add(rotatingdoor);
+    
 });
 
 // Table
@@ -498,6 +446,115 @@ loader.load('/Agent/cham.glb', function (gltf) {
     worldOctree.fromGraphNode(barrier);
 });
 
+// ROTATING DOOR ==============================================================
+let isDoorRotating = false;
+const rotatingDoorSpeed = Math.PI / 4; // Rotating door speed (radians per second)
+let rotatingDoorAngle = 0;
+const rotatingDoorAxis = new THREE.Vector3(0, 1, 0);
+
+
+// Add this code inside loader for rotating door
+
+
+// Function to rotate the door
+function rotateDoor() {
+    if (!isDoorRotating) {
+        isDoorRotating = true;
+        const targetAngle = rotatingDoorAngle + Math.PI / 2;
+
+        const doorTween = new TWEEN.Tween({ angle: rotatingDoorAngle })
+            .to({ angle: targetAngle }, (Math.PI / 2) / rotatingDoorSpeed * 1000)
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .onUpdate(({ angle }) => {
+                const deltaAngle = angle - rotatingDoorAngle;
+                rotatingdoor.rotateOnAxis(rotatingDoorAxis, deltaAngle);
+                rotatingDoorAngle = angle;
+            })
+            .onComplete(() => {
+                isDoorRotating = false;
+            });
+
+        doorTween.start();
+    }
+}
+
+const raycaster = new THREE.Raycaster();
+const rayDirection = new THREE.Vector3();
+
+function checkCollisionWithDoorRaycasting() {
+    const playerPosition = new THREE.Vector3();
+    playerCollider.getCenter(playerPosition);
+
+    // Set the direction of the ray to the camera's direction
+    camera.getWorldDirection(rayDirection);
+
+    // Set the origin and direction of the ray
+    raycaster.set(playerPosition, rayDirection);
+
+    // Check for intersections with the door
+    const intersects = raycaster.intersectObject(rotatingdoor, true);
+
+    if (intersects.length > 0) {
+        const intersection = intersects[0];
+        const distance = intersection.distance;
+        const collisionThreshold = 1.0; // Adjust the threshold as needed
+
+        if (distance < collisionThreshold) {
+            // Collision detected
+            isCollidingWithDoor = true;
+            playerVelocity.set(0, 0, 0);
+        } else {
+            isCollidingWithDoor = false;
+        }
+    } else {
+        isCollidingWithDoor = false;
+    }
+}
+
+
+// Add these variables at the beginning of your script
+let isLeverHighlighted = false;
+const leverMessage = document.getElementById('leverMessage'); // Element to show lever message
+
+// Add these functions to handle lever proximity and highlighting
+function checkLeverProximityAndOrientation() {
+    if (!lever) return;
+
+    const leverPosition = new THREE.Vector3();
+    lever.getWorldPosition(leverPosition);
+    const playerPosition = new THREE.Vector3();
+    playerCollider.getCenter(playerPosition);
+
+    const distance = leverPosition.distanceTo(playerPosition);
+    const forwardVector = getForwardVector();
+    const directionToLever = leverPosition.clone().sub(playerPosition).normalize();
+
+    if (distance < 3 && forwardVector.dot(directionToLever) > 0.7) {
+        if (!isLeverHighlighted) {
+            highlightLever(true);
+            leverMessage.style.display = 'block';
+            isLeverHighlighted = true;
+        }
+    } else {
+        if (isLeverHighlighted) {
+            highlightLever(false);
+            leverMessage.style.display = 'none';
+            isLeverHighlighted = false;
+        }
+    }
+}
+
+function highlightLever(highlight) {
+    if (!lever) return;
+
+    lever.traverse((node) => {
+        if (node.isMesh) {
+            node.material.emissive = new THREE.Color(highlight ? 0x00ff00 : 0x000000);
+            node.material.emissiveIntensity = highlight ? 0.5 : 0;
+        }
+    });
+}
+
 // FLOOR======================
 const floorSize = 50;
 const tileSize = 10;
@@ -619,7 +676,6 @@ function toggleWeapon() {
         }
     }
 }
-
 function animate() {
     requestAnimationFrame(animate);
 
@@ -634,14 +690,17 @@ function animate() {
     handleSpin();
     preventKnifeClipping();
     preventGunClipping();
-    checkLeverProximityAndOrientation();  // Add this line
+    checkLeverProximityAndOrientation();
+    checkCollisionWithDoorRaycasting();
 
-    // Update the mixer if it's defined
+
     if (mixer_chamber) {
         mixer_chamber.update(deltaTime);
     }
 
+    TWEEN.update();
     renderer.render(scene, camera);
 }
+
 
 animate();
