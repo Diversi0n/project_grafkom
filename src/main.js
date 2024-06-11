@@ -380,88 +380,88 @@ loader.load( '/Lever/lever.glb', function ( gltf ) {
 });
 
 // Building 4================
-// loader.load('/Building/house_valo.glb', function (gltf) {
-//     building4 = gltf.scene;
-//     building4.position.set(-16, -0.2, 15);
-//     building4.scale.set(1, 1, 1);
-//     building4.rotation.set(0, 0, 0);
-//     building4.traverse((node) => {
-//         if (node.isMesh) {
-//             node.castShadow = true;
-//             node.receiveShadow = true;
-//         }
-//     });
-//     scene.add(building4);
-//     worldOctree.fromGraphNode(building4);
-// });
+loader.load('/Building/house_valo.glb', function (gltf) {
+    building4 = gltf.scene;
+    building4.position.set(-16, -0.2, 15);
+    building4.scale.set(1, 1, 1);
+    building4.rotation.set(0, 0, 0);
+    building4.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+    scene.add(building4);
+    worldOctree.fromGraphNode(building4);
+});
 
-//longwall1 =========================
-// loader.load( '/Wall/longwall.glb', function ( gltf ) {
-//     longwall1 = gltf.scene;
-//     longwall1.scale.set(2, 2, 2);
-//     longwall1.rotation.set(0, 0, 0);
-//     longwall1.position.set(-10, 0, -24.7);
-//     // longwall1.traverse((node) => {
-//     //     if (node.isMesh) {
-//     //       node.castShadow = true;
-//     //       node.receiveShadow = true;
-//     //     }
-//     // });
+// longwall1 =========================
+loader.load( '/Wall/longwall.glb', function ( gltf ) {
+    longwall1 = gltf.scene;
+    longwall1.scale.set(2, 2, 2);
+    longwall1.rotation.set(0, 0, 0);
+    longwall1.position.set(-10, 0, -24.7);
+    // longwall1.traverse((node) => {
+    //     if (node.isMesh) {
+    //       node.castShadow = true;
+    //       node.receiveShadow = true;
+    //     }
+    // });
 
-// 	scene.add( longwall1 );
-//     worldOctree.fromGraphNode( longwall1 )
-// });
+	scene.add( longwall1 );
+    worldOctree.fromGraphNode( longwall1 )
+});
 
-// //longwall2 =========================
-// loader.load( '/Wall/longwall.glb', function ( gltf ) {
-//     longwall2 = gltf.scene;
-//     longwall2.scale.set(2, 2, 2);
-//     longwall2.rotation.set(0, Math.PI / 2, 0);
-//     longwall2.position.set(-24.5, 0, -6);
-//     // longwall2.traverse((node) => {
-//     //     if (node.isMesh) {
-//     //       node.castShadow = true;
-//     //       node.receiveShadow = true;
-//     //     }
-//     // });
+//longwall2 =========================
+loader.load( '/Wall/longwall.glb', function ( gltf ) {
+    longwall2 = gltf.scene;
+    longwall2.scale.set(2, 2, 2);
+    longwall2.rotation.set(0, Math.PI / 2, 0);
+    longwall2.position.set(-24.5, 0, -6);
+    // longwall2.traverse((node) => {
+    //     if (node.isMesh) {
+    //       node.castShadow = true;
+    //       node.receiveShadow = true;
+    //     }
+    // });
 
-// 	scene.add( longwall2 );
-//     worldOctree.fromGraphNode( longwall2 )
-// });
+	scene.add( longwall2 );
+    worldOctree.fromGraphNode( longwall2 )
+});
 
-// //longwall3 =========================
-// loader.load( '/Wall/longwall.glb', function ( gltf ) {
-//     longwall3 = gltf.scene;
-//     longwall3.scale.set(2, 2, 2);
-//     longwall3.rotation.set(0, 90 * (Math.PI / 180), 0);
-//     longwall3.position.set(-24.3, 0, 6.3);
-//     // longwall3.traverse((node) => {
-//     //     if (node.isMesh) {
-//     //       node.castShadow = true;
-//     //       node.receiveShadow = true;
-//     //     }
-//     // });
+//longwall3 =========================
+loader.load( '/Wall/longwall.glb', function ( gltf ) {
+    longwall3 = gltf.scene;
+    longwall3.scale.set(2, 2, 2);
+    longwall3.rotation.set(0, 90 * (Math.PI / 180), 0);
+    longwall3.position.set(-24.3, 0, 6.3);
+    // longwall3.traverse((node) => {
+    //     if (node.isMesh) {
+    //       node.castShadow = true;
+    //       node.receiveShadow = true;
+    //     }
+    // });
 
-// 	scene.add( longwall3 );
-//     worldOctree.fromGraphNode( longwall3 )
-// });
+	scene.add( longwall3 );
+    worldOctree.fromGraphNode( longwall3 )
+});
 
-// //longwall1 =========================
-// loader.load( '/Wall/longwall.glb', function ( gltf ) {
-//     longwall4 = gltf.scene;
-//     longwall4.scale.set(2, 2, 2);
-//     longwall4.rotation.set(0, -1 * (Math.PI / 180), 0);
-//     longwall4.position.set(-10, 0, 25);
-//     // longwall4.traverse((node) => {
-//     //     if (node.isMesh) {
-//     //       node.castShadow = true;
-//     //       node.receiveShadow = true;
-//     //     }
-//     // });
+//longwall4 =========================
+loader.load( '/Wall/longwall.glb', function ( gltf ) {
+    longwall4 = gltf.scene;
+    longwall4.scale.set(2, 2, 2);
+    longwall4.rotation.set(0, -1 * (Math.PI / 180), 0);
+    longwall4.position.set(-10, 0, 25);
+    // longwall4.traverse((node) => {
+    //     if (node.isMesh) {
+    //       node.castShadow = true;
+    //       node.receiveShadow = true;
+    //     }
+    // });
 
-// 	scene.add( longwall4 );
-//     worldOctree.fromGraphNode( longwall4 )
-// });
+	scene.add( longwall4 );
+    worldOctree.fromGraphNode( longwall4 )
+});
 
 // chamber =========================
 loader.load('/Agent/cham.glb', function (gltf) {
