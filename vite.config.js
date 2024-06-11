@@ -1,6 +1,5 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 
-// https://vitejs.dev/config/
-export default {
+export default defineConfig({
   base: '/project_grafkom/', // ganti dengan nama repositori Anda
-};
+});
