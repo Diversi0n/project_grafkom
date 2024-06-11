@@ -231,7 +231,7 @@ function teleportPlayerIfOob() {
     }
 }
 
-let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4, lever, table, rotatingdoor, doorframe;
+let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4, longwall5, longwall6, longwall7, longwall8, lever, table, rotatingdoor, doorframe;
 let mixer_chamber;
 let doorBoundingBox;
 
