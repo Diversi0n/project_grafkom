@@ -308,7 +308,7 @@ loader.load('/Wall/rotatingdoor.glb', function (gltf) {
     scene.add(rotatingdoor);
 });
 
-// DoorFrame ================
+// DoorFrame
 loader.load('/Wall/doorframe.glb', function (gltf) {
     doorframe = gltf.scene;
     doorframe.scale.set(3, 2.8, 3.5);
@@ -329,7 +329,7 @@ loader.load( '/Lever/table.glb', function ( gltf ) {
     worldOctree.fromGraphNode( table )
 });
 
-// Table
+// Lever
 loader.load( '/Lever/lever.glb', function ( gltf ) {
     lever = gltf.scene;
     lever.scale.set(1, 1, 1);
@@ -340,7 +340,25 @@ loader.load( '/Lever/lever.glb', function ( gltf ) {
     worldOctree.fromGraphNode( lever )
 });
 
+// FotressWall1
+loader.load('/Wall/fotresswall.glb', function (gltf) {
+    fotresswall1 = gltf.scene;
+    fotresswall1.scale.set(2.6, 2.8, 4);
+    fotresswall1.rotation.set(0, Math.PI + (Math.PI / 2), 0);
+    fotresswall1.position.set(9, -2, -16.3);
+    worldOctree.fromGraphNode( fotresswall1 )
+    scene.add(fotresswall1);
+});
 
+// FotressWall2
+loader.load('/Wall/fotresswall.glb', function (gltf) {
+    fotresswall1 = gltf.scene;
+    fotresswall1.scale.set(3.9, 2.8, 4);
+    fotresswall1.rotation.set(0, Math.PI + (Math.PI / 2), 0);
+    fotresswall1.position.set(9, -2, 13.2);
+    worldOctree.fromGraphNode( fotresswall1 )
+    scene.add(fotresswall1);
+});
 
 // longwall1 =========================
 loader.load( '/Wall/longwall.glb', function ( gltf ) {
