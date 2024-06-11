@@ -93,12 +93,56 @@ loader.load('/Gun/kar98k.glb', (gltf) => {
     console.error('Error loading gun:', error);
 });
 
+let isLeverHighlighted = false;
+const leverMessage = document.getElementById('leverMessage');
+
+function checkLeverProximityAndOrientation() {
+    const leverPosition = new THREE.Vector3();
+    lever.getWorldPosition(leverPosition);
+    const playerPosition = new THREE.Vector3();
+    playerCollider.getCenter(playerPosition);
+
+    const distance = leverPosition.distanceTo(playerPosition);
+    const forwardVector = getForwardVector();
+    const directionToLever = leverPosition.clone().sub(playerPosition).normalize();
+
+    if (distance < 3 && forwardVector.dot(directionToLever) > 0.7) {
+        if (!isLeverHighlighted) {
+            highlightLever(true);
+            leverMessage.style.display = 'block';
+            isLeverHighlighted = true;
+        }
+    } else {
+        if (isLeverHighlighted) {
+            highlightLever(false);
+            leverMessage.style.display = 'none';
+            isLeverHighlighted = false;
+        }
+    }
+}
+
+function highlightLever(highlight) {
+    lever.traverse((node) => {
+        if (node.isMesh) {
+            if (highlight) {
+                node.originalColor = node.material.color.clone();
+                node.material.color.set(0xffffff);
+            } else {
+                node.material.color.copy(node.originalColor);
+            }
+        }
+    });
+}
 
 document.addEventListener('keydown', (event) => {
     keyStates[event.code] = true;
 
     if (event.code === 'KeyE' && !isWeaponSwitching) {
         toggleWeapon();
+    }
+
+    if (event.code === 'KeyF' && isLeverHighlighted) {
+        console.log('Lever activated');
     }
 });
 
@@ -230,7 +274,7 @@ function teleportPlayerIfOob() {
     }
 }
 
-let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4;
+let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4, lever, table, rotatingdoor;
 let mixer_chamber;
 let rumahnpc = [];
 let lamp = [];
@@ -239,7 +283,7 @@ let lampCollider = [];
 // Building 1================
 loader.load('/Building/building1.glb', function (gltf) {
     building1 = gltf.scene;
-    building1.position.set(-16, 0, -13);
+    building1.position.set(-16, 0, -13.3);
     building1.scale.set(2, 2, 2);
     building1.rotation.set(0, 0, 0);
     building1.traverse((node) => {
@@ -284,105 +328,156 @@ loader.load('/Building/building2.glb', function (gltf) {
     worldOctree.fromGraphNode(building3);
 });
 
+// Rotating Door================
+loader.load( '/Wall/rotatingdoor.glb', function ( gltf ) {
+    rotatingdoor = gltf.scene;
+    rotatingdoor.scale.set(2, 2, 2);
+    rotatingdoor.rotation.set(0, Math.PI / 2, 0);
+    rotatingdoor.position.set(10, 0, -7);
+    // longwall1.traverse((node) => {
+    //     if (node.isMesh) {
+    //       node.castShadow = true;
+    //       node.receiveShadow = true;
+    //     }
+    // });
+
+	scene.add( rotatingdoor );
+    worldOctree.fromGraphNode( rotatingdoor )
+});
+
+// Table
+loader.load( '/Lever/table.glb', function ( gltf ) {
+    table = gltf.scene;
+    table.scale.set(0.02, 0.02, 0.02);
+    table.rotation.set(0, Math.PI / 2, 0);
+    table.position.set(3, -0.845, -4);
+    // longwall1.traverse((node) => {
+    //     if (node.isMesh) {
+    //       node.castShadow = true;
+    //       node.receiveShadow = true;
+    //     }
+    // });
+
+	scene.add( table );
+    worldOctree.fromGraphNode( table )
+});
+
+// Table
+loader.load( '/Lever/lever.glb', function ( gltf ) {
+    lever = gltf.scene;
+    lever.scale.set(1, 1, 1);
+    lever.rotation.set(0, Math.PI / 2, 0);
+    lever.position.set(3, 0.7, -4);
+    // longwall1.traverse((node) => {
+    //     if (node.isMesh) {
+    //       node.castShadow = true;
+    //       node.receiveShadow = true;
+    //     }
+    // });
+
+	scene.add( lever );
+    worldOctree.fromGraphNode( lever )
+});
+
 // Building 4================
-loader.load('/Building/house_valo.glb', function (gltf) {
-    building4 = gltf.scene;
-    building4.position.set(-16, -0.2, 15);
-    building4.scale.set(1, 1, 1);
-    building4.rotation.set(0, 0, 0);
-    building4.traverse((node) => {
-        if (node.isMesh) {
-            node.castShadow = true;
-            node.receiveShadow = true;
-        }
-    });
-    scene.add(building4);
-    worldOctree.fromGraphNode(building4);
-});
+// loader.load('/Building/house_valo.glb', function (gltf) {
+//     building4 = gltf.scene;
+//     building4.position.set(-16, -0.2, 15);
+//     building4.scale.set(1, 1, 1);
+//     building4.rotation.set(0, 0, 0);
+//     building4.traverse((node) => {
+//         if (node.isMesh) {
+//             node.castShadow = true;
+//             node.receiveShadow = true;
+//         }
+//     });
+//     scene.add(building4);
+//     worldOctree.fromGraphNode(building4);
+// });
 
 //longwall1 =========================
-loader.load( '/Wall/longwall.glb', function ( gltf ) {
-    longwall1 = gltf.scene;
-    longwall1.scale.set(2, 2, 2);
-    longwall1.rotation.set(0, 0, 0);
-    longwall1.position.set(-10, 0, -24.7);
-    longwall1.traverse((node) => {
-        if (node.isMesh) {
-          node.castShadow = true;
-          node.receiveShadow = true;
-        }
-    });
+// loader.load( '/Wall/longwall.glb', function ( gltf ) {
+//     longwall1 = gltf.scene;
+//     longwall1.scale.set(2, 2, 2);
+//     longwall1.rotation.set(0, 0, 0);
+//     longwall1.position.set(-10, 0, -24.7);
+//     // longwall1.traverse((node) => {
+//     //     if (node.isMesh) {
+//     //       node.castShadow = true;
+//     //       node.receiveShadow = true;
+//     //     }
+//     // });
 
-	scene.add( longwall1 );
-    worldOctree.fromGraphNode( longwall1 )
-});
+// 	scene.add( longwall1 );
+//     worldOctree.fromGraphNode( longwall1 )
+// });
 
-//longwall2 =========================
-loader.load( '/Wall/longwall.glb', function ( gltf ) {
-    longwall2 = gltf.scene;
-    longwall2.scale.set(2, 2, 2);
-    longwall2.rotation.set(0, Math.PI / 2, 0);
-    longwall2.position.set(-24.5, 0, -6);
-    longwall2.traverse((node) => {
-        if (node.isMesh) {
-          node.castShadow = true;
-          node.receiveShadow = true;
-        }
-    });
+// //longwall2 =========================
+// loader.load( '/Wall/longwall.glb', function ( gltf ) {
+//     longwall2 = gltf.scene;
+//     longwall2.scale.set(2, 2, 2);
+//     longwall2.rotation.set(0, Math.PI / 2, 0);
+//     longwall2.position.set(-24.5, 0, -6);
+//     // longwall2.traverse((node) => {
+//     //     if (node.isMesh) {
+//     //       node.castShadow = true;
+//     //       node.receiveShadow = true;
+//     //     }
+//     // });
 
-	scene.add( longwall2 );
-    worldOctree.fromGraphNode( longwall2 )
-});
+// 	scene.add( longwall2 );
+//     worldOctree.fromGraphNode( longwall2 )
+// });
 
-//longwall3 =========================
-loader.load( '/Wall/longwall.glb', function ( gltf ) {
-    longwall3 = gltf.scene;
-    longwall3.scale.set(2, 2, 2);
-    longwall3.rotation.set(0, 90 * (Math.PI / 180), 0);
-    longwall3.position.set(-24.3, 0, 6.3);
-    longwall3.traverse((node) => {
-        if (node.isMesh) {
-          node.castShadow = true;
-          node.receiveShadow = true;
-        }
-    });
+// //longwall3 =========================
+// loader.load( '/Wall/longwall.glb', function ( gltf ) {
+//     longwall3 = gltf.scene;
+//     longwall3.scale.set(2, 2, 2);
+//     longwall3.rotation.set(0, 90 * (Math.PI / 180), 0);
+//     longwall3.position.set(-24.3, 0, 6.3);
+//     // longwall3.traverse((node) => {
+//     //     if (node.isMesh) {
+//     //       node.castShadow = true;
+//     //       node.receiveShadow = true;
+//     //     }
+//     // });
 
-	scene.add( longwall3 );
-    worldOctree.fromGraphNode( longwall3 )
-});
+// 	scene.add( longwall3 );
+//     worldOctree.fromGraphNode( longwall3 )
+// });
 
-//longwall1 =========================
-loader.load( '/Wall/longwall.glb', function ( gltf ) {
-    longwall4 = gltf.scene;
-    longwall4.scale.set(2, 2, 2);
-    longwall4.rotation.set(0, -1 * (Math.PI / 180), 0);
-    longwall4.position.set(-10, 0, 25);
-    longwall4.traverse((node) => {
-        if (node.isMesh) {
-          node.castShadow = true;
-          node.receiveShadow = true;
-        }
-    });
+// //longwall1 =========================
+// loader.load( '/Wall/longwall.glb', function ( gltf ) {
+//     longwall4 = gltf.scene;
+//     longwall4.scale.set(2, 2, 2);
+//     longwall4.rotation.set(0, -1 * (Math.PI / 180), 0);
+//     longwall4.position.set(-10, 0, 25);
+//     // longwall4.traverse((node) => {
+//     //     if (node.isMesh) {
+//     //       node.castShadow = true;
+//     //       node.receiveShadow = true;
+//     //     }
+//     // });
 
-	scene.add( longwall4 );
-    worldOctree.fromGraphNode( longwall4 )
-});
+// 	scene.add( longwall4 );
+//     worldOctree.fromGraphNode( longwall4 )
+// });
 
-//chamber =========================
-loader.load( '/Agent/cham.glb', function ( gltf ) {
+// chamber =========================
+loader.load('/Agent/cham.glb', function (gltf) {
     chamber = gltf.scene;
     chamber.scale.set(1.1, 1.1, 1.1);
     chamber.rotation.set(0, 0, 0);
     chamber.position.set(0, 0, -20);
     chamber.traverse((node) => {
         if (node.isMesh) {
-          node.castShadow = true;
-          node.receiveShadow = true;
+            node.castShadow = true;
+            node.receiveShadow = true;
         }
     });
 
-	scene.add( chamber );
-    worldOctree.fromGraphNode( chamber )
+    scene.add(chamber);
+    worldOctree.fromGraphNode(chamber);
 
     // Create an AnimationMixer and pass in the model's animations
     mixer_chamber = new THREE.AnimationMixer(chamber);
@@ -390,6 +485,17 @@ loader.load( '/Agent/cham.glb', function ( gltf ) {
     // Play the first animation in the model's animation array
     const action = mixer_chamber.clipAction(gltf.animations[0]);
     action.play();
+
+    // Create an invisible barrier around the chamber to prevent collisions
+    const barrierGeometry = new THREE.BoxGeometry(1, 3, 3);  // Adjust the size as needed
+    const barrierMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, visible: false });
+    const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
+
+    // Position the barrier around the chamber
+    barrier.position.set(0, 1.5, -20);  // Adjust the position to match the chamber
+
+    scene.add(barrier);
+    worldOctree.fromGraphNode(barrier);
 });
 
 // FLOOR======================
@@ -527,7 +633,8 @@ function animate() {
 
     handleSpin();
     preventKnifeClipping();
-    preventGunClipping();  // Add this line
+    preventGunClipping();
+    checkLeverProximityAndOrientation();  // Add this line
 
     // Update the mixer if it's defined
     if (mixer_chamber) {
