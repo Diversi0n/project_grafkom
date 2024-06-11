@@ -231,8 +231,9 @@ function teleportPlayerIfOob() {
     }
 }
 
-let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4, longwall5, longwall6, longwall7, longwall8, lever, table, rotatingdoor, doorframe;
+let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4, longwall5, longwall6, longwall7, longwall8, lever, table, rotatingdoor, doorframe, fotresswall1, wallgun1, wallgun2, wallgun3, wallgun4;
 let mixer_chamber;
+let mixer_wallgun1, mixer_wallgun2, mixer_wallgun3, mixer_wallgun4;
 let doorBoundingBox;
 
 // Building 1================
@@ -502,6 +503,100 @@ loader.load('/Agent/cham.glb', function (gltf) {
     worldOctree.fromGraphNode(barrier);
 });
 
+//Gun Tower 1
+loader.load('/WallGun/guntower.glb', function (gltf) {
+    wallgun1 = gltf.scene;
+    wallgun1.scale.set(0.02, 0.05, 0.04);
+    wallgun1.rotation.set(0, 180 * (Math.PI / 180), 0);
+    wallgun1.position.set(9, 9, -13);
+    wallgun1.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+
+    scene.add(wallgun1);
+    worldOctree.fromGraphNode(wallgun1);
+
+    // Create an AnimationMixer and pass in the model's animations
+    mixer_wallgun1 = new THREE.AnimationMixer(wallgun1);
+    // Play the first animation in the model's animation array
+    const action = mixer_wallgun1.clipAction(gltf.animations[0]);
+    action.play();
+});
+
+//Gun Tower 2
+loader.load('/WallGun/guntower.glb', function (gltf) {
+    wallgun2 = gltf.scene;
+    wallgun2.scale.set(0.02, 0.05, 0.04);
+    wallgun2.rotation.set(0, 180 * (Math.PI / 180), 0);
+    wallgun2.position.set(9, 9, -20);
+    wallgun2.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+
+    scene.add(wallgun2);
+    worldOctree.fromGraphNode(wallgun2);
+
+    // Create an AnimationMixer and pass in the model's animations
+    mixer_wallgun2 = new THREE.AnimationMixer(wallgun2);
+    console.log(gltf.animations[0]);
+    // Play the first animation in the model's animation array
+    const action = mixer_wallgun2.clipAction(gltf.animations[0]);
+    action.play();
+});
+
+//Gun Tower 3
+loader.load('/WallGun/guntower.glb', function (gltf) {
+    wallgun3 = gltf.scene;
+    wallgun3.scale.set(0.02, 0.05, 0.04);
+    wallgun3.rotation.set(0, 180 * (Math.PI / 180), 0);
+    wallgun3.position.set(9, 9, 10);
+    wallgun3.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+
+    scene.add(wallgun3);
+    worldOctree.fromGraphNode(wallgun3);
+
+    // Create an AnimationMixer and pass in the model's animations
+    mixer_wallgun3 = new THREE.AnimationMixer(wallgun3);
+    // Play the first animation in the model's animation array
+    const action = mixer_wallgun3.clipAction(gltf.animations[0]);
+    action.play();
+});
+
+//Gun Tower 4
+loader.load('/WallGun/guntower.glb', function (gltf) {
+    wallgun4 = gltf.scene;
+    wallgun4.scale.set(0.02, 0.05, 0.04);
+    wallgun4.rotation.set(0, 180 * (Math.PI / 180), 0);
+    wallgun4.position.set(9, 9, 20);
+    wallgun4.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+
+    scene.add(wallgun4);
+    worldOctree.fromGraphNode(wallgun4);
+
+    // Create an AnimationMixer and pass in the model's animations
+    mixer_wallgun4 = new THREE.AnimationMixer(wallgun4);
+    console.log(gltf.animations[0]);
+    // Play the first animation in the model's animation array
+    const action = mixer_wallgun4.clipAction(gltf.animations[0]);
+    action.play();
+});
+
 // ROTATING DOOR ==============================================================
 let isDoorRotating = false;
 const rotatingDoorSpeed = Math.PI / 4; // Rotating door speed (radians per second)
@@ -752,6 +847,18 @@ function animate() {
 
     if (mixer_chamber) {
         mixer_chamber.update(deltaTime);
+    }
+    if (mixer_wallgun1) {
+        mixer_wallgun1.update(deltaTime);
+    }
+    if (mixer_wallgun2) {
+        mixer_wallgun2.update(deltaTime);
+    }
+    if (mixer_wallgun3) {
+        mixer_wallgun3.update(deltaTime);
+    }
+    if (mixer_wallgun4) {
+        mixer_wallgun4.update(deltaTime);
     }
 
     TWEEN.update();
