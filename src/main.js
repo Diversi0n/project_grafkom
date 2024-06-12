@@ -441,7 +441,7 @@ loader.load('/Agent/cham.glb', function (gltf) {
     const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
 
     // Position the barrier around the agent1
-    barrier.position.set(0, 1, -21);  // Adjust the position to match the agent1
+    barrier.position.set(22.5, 1, -19);  // Adjust the position to match the agent1
 
     scene.add(barrier);
     worldOctree.fromGraphNode(barrier);
@@ -475,7 +475,7 @@ loader.load('/Agent/cham.glb', function (gltf) {
     const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
 
     // Position the barrier around the agent2
-    barrier.position.set(0, 1, -21);  // Adjust the position to match the agent2
+    barrier.position.set(22.5, 1, -14);  // Adjust the position to match the agent2
 
     scene.add(barrier);
     worldOctree.fromGraphNode(barrier);
@@ -509,7 +509,7 @@ loader.load('/Agent/cham.glb', function (gltf) {
     const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
 
     // Position the barrier around the agent3
-    barrier.position.set(0, 1, -21);  // Adjust the position to match the agent3
+    barrier.position.set(22.5, 1, 10);  // Adjust the position to match the agent3
 
     scene.add(barrier);
     worldOctree.fromGraphNode(barrier);
@@ -543,7 +543,7 @@ loader.load('/Agent/cham.glb', function (gltf) {
     const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
 
     // Position the barrier around the agent4
-    barrier.position.set(0, 1, -21);  // Adjust the position to match the agent4
+    barrier.position.set(22.5, 1, 19);  // Adjust the position to match the agent4
 
     scene.add(barrier);
     worldOctree.fromGraphNode(barrier);
