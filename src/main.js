@@ -4,6 +4,18 @@ import { Octree } from 'three/addons/math/Octree.js';
 import { Capsule } from 'three/addons/math/Capsule.js';
 import TWEEN from '@tweenjs/tween.js';
 
+// import { GLTFLoader } from './node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+// import { Octree } from './node_modules/three/examples/jsm/math/Octree.js';
+// import { Capsule } from './node_modules/three/examples/jsm/math/Capsule.js';
+// import * as TWEEN from './node_modules/@tweenjs/tween.js/dist/tween.esm.js';
+
+// import * as THREE from './node_modules/three/src/Three.js';
+// import { GLTFLoader } from './node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+// import { Octree } from './node_modules/three/examples/jsm/math/Octree.js';
+// import { Capsule } from './node_modules/three/examples/jsm/math/Capsule.js';
+// import * as TWEEN from './node_modules/@tweenjs/tween.js/dist/tween.esm.js';
+
+
 // INIT===============================================
 
 const scene = new THREE.Scene();
