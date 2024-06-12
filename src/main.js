@@ -243,8 +243,8 @@ function teleportPlayerIfOob() {
     }
 }
 
-let building1, building2, building3, building4, chamber, longwall1, longwall2, longwall3, longwall4, longwall5, longwall6, longwall7, longwall8, lever, table, rotatingdoor, doorframe, fotresswall1, wallgun1, wallgun2, wallgun3, wallgun4;
-let mixer_chamber;
+let building1, building2, building3, building4, agent1, agent2, agent3, agent4, longwall1, longwall2, longwall3, longwall4, lever, table, rotatingdoor, doorframe, fotresswall1, wallgun1, wallgun2, wallgun3, wallgun4;
+let mixer_agent1, mixer_agent2, mixer_agent3, mixer_agent4;
 let mixer_wallgun1, mixer_wallgun2, mixer_wallgun3, mixer_wallgun4;
 let doorBoundingBox;
 
@@ -376,7 +376,7 @@ loader.load('/Wall/fotresswall.glb', function (gltf) {
 // longwall1 =========================
 loader.load( '/Wall/longwall.glb', function ( gltf ) {
     longwall1 = gltf.scene;
-    longwall1.scale.set(2, 2, 2);
+    longwall1.scale.set(4, 2, 2);
     longwall1.rotation.set(0, 0, 0);
     longwall1.position.set(-10, 0, -24.7);
 	scene.add( longwall1 );
@@ -386,9 +386,9 @@ loader.load( '/Wall/longwall.glb', function ( gltf ) {
 //longwall2 =========================
 loader.load( '/Wall/longwall.glb', function ( gltf ) {
     longwall2 = gltf.scene;
-    longwall2.scale.set(2, 2, 2);
+    longwall2.scale.set(2.7, 2, 2);
     longwall2.rotation.set(0, 90 * (Math.PI / 180), 0);
-    longwall2.position.set(-24.5, 0, -6);
+    longwall2.position.set(-24.5, 0, 0);
 	scene.add( longwall2 );
     worldOctree.fromGraphNode( longwall2 )
 });
@@ -396,9 +396,9 @@ loader.load( '/Wall/longwall.glb', function ( gltf ) {
 //longwall3 =========================
 loader.load( '/Wall/longwall.glb', function ( gltf ) {
     longwall3 = gltf.scene;
-    longwall3.scale.set(2, 2, 2);
-    longwall3.rotation.set(0, 90 * (Math.PI / 180), 0);
-    longwall3.position.set(-24.3, 0, 6.3);
+    longwall3.scale.set(4, 2, 2);
+    longwall3.rotation.set(0, 0, 0);
+    longwall3.position.set(-10, 0, 25);
 	scene.add( longwall3 );
     worldOctree.fromGraphNode( longwall3 )
 });
@@ -406,110 +406,144 @@ loader.load( '/Wall/longwall.glb', function ( gltf ) {
 //longwall4 =========================
 loader.load( '/Wall/longwall.glb', function ( gltf ) {
     longwall4 = gltf.scene;
-    longwall4.scale.set(2, 2, 2);
-    longwall4.rotation.set(0, -1 * (Math.PI / 180), 0);
-    longwall4.position.set(-10, 0, 25);
+    longwall4.scale.set(2.7, 2, 2);
+    longwall4.rotation.set(0, 90 * (Math.PI / 180), 0);
+    longwall4.position.set(26.5, 0, 0);
 	scene.add( longwall4 );
     worldOctree.fromGraphNode( longwall4 )
 });
 
-//longwall5 =========================
-loader.load( '/Wall/longwall.glb', function ( gltf ) {
-    longwall5 = gltf.scene;
-    longwall5.scale.set(2, 2, 2);
-    longwall5.rotation.set(0, 90 * (Math.PI / 180), 0);
-    longwall5.position.set(24.5, 0, -6);
-    // longwall5.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
-	scene.add( longwall5 );
-    worldOctree.fromGraphNode( longwall5 )
-});
-
-//longwall6 =========================
-loader.load( '/Wall/longwall.glb', function ( gltf ) {
-    longwall6 = gltf.scene;
-    longwall6.scale.set(2, 2, 2);
-    longwall6.rotation.set(0, 90 * (Math.PI / 180), 0);
-    longwall6.position.set(24.7, 0, 6.3);
-    // longwall6.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
-	scene.add( longwall6 );
-    worldOctree.fromGraphNode( longwall6 )
-});
-
-// longwall7 =========================
-loader.load( '/Wall/longwall.glb', function ( gltf ) {
-    longwall7 = gltf.scene;
-    longwall7.scale.set(2, 2, 2);
-    longwall7.rotation.set(0, 0, 0);
-    longwall7.position.set(8, 0, -24.7);
-    // longwall7.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
-	scene.add( longwall7 );
-    worldOctree.fromGraphNode( longwall7 )
-});
-
-//longwall8 =========================
-loader.load( '/Wall/longwall.glb', function ( gltf ) {
-    longwall8 = gltf.scene;
-    longwall8.scale.set(2, 2, 2);
-    longwall8.rotation.set(0, -1 * (Math.PI / 180), 0);
-    longwall8.position.set(8, 0, 25);
-    // longwall8.traverse((node) => {
-    //     if (node.isMesh) {
-    //       node.castShadow = true;
-    //       node.receiveShadow = true;
-    //     }
-    // });
-
-	scene.add( longwall8 );
-    worldOctree.fromGraphNode( longwall8 )
-});
-
-// chamber =========================
+// agent1 =========================
 loader.load('/Agent/cham.glb', function (gltf) {
-    chamber = gltf.scene;
-    chamber.scale.set(1.1, 1.1, 1.1);
-    chamber.rotation.set(0, 0, 0);
-    chamber.position.set(0, 0, -20);
-    chamber.traverse((node) => {
+    agent1 = gltf.scene;
+    agent1.scale.set(1.075, 1.075, 1.075);
+    agent1.rotation.set(0, 180 * (Math.PI / 180), 0);
+    agent1.position.set(22.5, 0, -20);
+    agent1.traverse((node) => {
         if (node.isMesh) {
             node.castShadow = true;
             node.receiveShadow = true;
         }
     });
 
-    scene.add(chamber);
-    worldOctree.fromGraphNode(chamber);
+    scene.add(agent1);
+    worldOctree.fromGraphNode(agent1);
 
     // Create an AnimationMixer and pass in the model's animations
-    mixer_chamber = new THREE.AnimationMixer(chamber);
+    mixer_agent1 = new THREE.AnimationMixer(agent1);
     // Play the first animation in the model's animation array
-    const action = mixer_chamber.clipAction(gltf.animations[0]);
+    const action = mixer_agent1.clipAction(gltf.animations[0]);
     action.play();
 
-    // Create an invisible barrier around the chamber to prevent collisions
+    // Create an invisible barrier around the agent1 to prevent collisions
     const barrierGeometry = new THREE.BoxGeometry(1, 2, 2);  // Adjust the size as needed
     const barrierMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, visible: false });
     const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
 
-    // Position the barrier around the chamber
-    barrier.position.set(0, 1, -21);  // Adjust the position to match the chamber
+    // Position the barrier around the agent1
+    barrier.position.set(22.5, 1, -19);  // Adjust the position to match the agent1
+
+    scene.add(barrier);
+    worldOctree.fromGraphNode(barrier);
+});
+
+// agent2 =========================
+loader.load('/Agent/cham.glb', function (gltf) {
+    agent2 = gltf.scene;
+    agent2.scale.set(1.075, 1.075, 1.075);
+    agent2.rotation.set(0, 180 * (Math.PI / 180), 0);
+    agent2.position.set(22.5, 0, -15);
+    agent2.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+
+    scene.add(agent2);
+    worldOctree.fromGraphNode(agent2);
+
+    // Create an AnimationMixer and pass in the model's animations
+    mixer_agent2 = new THREE.AnimationMixer(agent2);
+    // Play the first animation in the model's animation array
+    const action = mixer_agent2.clipAction(gltf.animations[0]);
+    action.play();
+
+    // Create an invisible barrier around the agent2 to prevent collisions
+    const barrierGeometry = new THREE.BoxGeometry(1, 2, 2);  // Adjust the size as needed
+    const barrierMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, visible: false });
+    const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
+
+    // Position the barrier around the agent2
+    barrier.position.set(22.5, 1, -14);  // Adjust the position to match the agent2
+
+    scene.add(barrier);
+    worldOctree.fromGraphNode(barrier);
+});
+
+// agent3 =========================
+loader.load('/Agent/cham.glb', function (gltf) {
+    agent3 = gltf.scene;
+    agent3.scale.set(1.075, 1.075, 1.075);
+    agent3.rotation.set(0, 180 * (Math.PI / 180), 0);
+    agent3.position.set(22.5, 0, 9);
+    agent3.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+
+    scene.add(agent3);
+    worldOctree.fromGraphNode(agent3);
+
+    // Create an AnimationMixer and pass in the model's animations
+    mixer_agent3 = new THREE.AnimationMixer(agent3);
+    // Play the first animation in the model's animation array
+    const action = mixer_agent3.clipAction(gltf.animations[0]);
+    action.play();
+
+    // Create an invisible barrier around the agent3 to prevent collisions
+    const barrierGeometry = new THREE.BoxGeometry(1, 2, 2);  // Adjust the size as needed
+    const barrierMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, visible: false });
+    const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
+
+    // Position the barrier around the agent3
+    barrier.position.set(22.5, 1, 10);  // Adjust the position to match the agent3
+
+    scene.add(barrier);
+    worldOctree.fromGraphNode(barrier);
+});
+
+// agent4 =========================
+loader.load('/Agent/cham.glb', function (gltf) {
+    agent4 = gltf.scene;
+    agent4.scale.set(1.075, 1.075, 1.075);
+    agent4.rotation.set(0, 180 * (Math.PI / 180), 0);
+    agent4.position.set(22.5, 0, 18);
+    agent4.traverse((node) => {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+
+    scene.add(agent4);
+    worldOctree.fromGraphNode(agent4);
+
+    // Create an AnimationMixer and pass in the model's animations
+    mixer_agent4 = new THREE.AnimationMixer(agent4);
+    // Play the first animation in the model's animation array
+    const action = mixer_agent4.clipAction(gltf.animations[0]);
+    action.play();
+
+    // Create an invisible barrier around the agent4 to prevent collisions
+    const barrierGeometry = new THREE.BoxGeometry(1, 2, 2);  // Adjust the size as needed
+    const barrierMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, visible: false });
+    const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
+
+    // Position the barrier around the agent4
+    barrier.position.set(22.5, 1, 19);  // Adjust the position to match the agent4
 
     scene.add(barrier);
     worldOctree.fromGraphNode(barrier);
@@ -741,6 +775,34 @@ scene.add(floorMesh);
 
 worldOctree.fromGraphNode(floorMesh);
 
+// SAND======================
+const sandSize = 10;
+const sandtileSize = 10;
+const sandnumTiles = Math.ceil(sandSize / sandtileSize);
+
+const sandGeometry = new THREE.PlaneGeometry(sandSize * sandnumTiles, sandSize * sandnumTiles, sandnumTiles, sandnumTiles);
+const sandMaterial = new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: true });
+
+const sandLoader = new THREE.TextureLoader();
+const sandTexture = sandLoader.load('/Floor/sand2.jpg');
+sandTexture.wrapS = THREE.RepeatWrapping;
+sandTexture.wrapT = THREE.RepeatWrapping;
+sandTexture.repeat.set(sandnumTiles, sandnumTiles);
+sandMaterial.map = sandTexture;  // Corrected here
+
+const sandMesh = new THREE.Mesh(sandGeometry, sandMaterial);
+sandMesh.rotation.x = -Math.PI / 2;
+sandMesh.receiveShadow = true;
+sandMesh.castShadow = true;
+
+// Set the position of the sand mesh
+sandMesh.position.set(20, 0.02, 0);  // Change these values to reposition the sand mesh
+sandMesh.scale.set(2, 5, 1);  // Change these values to reposition the sand mesh
+
+scene.add(sandMesh);
+
+worldOctree.fromGraphNode(sandMesh);
+
 // BACKGROUND
 const backgroundGeometry = new THREE.SphereGeometry(500, 32, 32);
 
@@ -857,8 +919,17 @@ function animate() {
     checkCollisionWithDoorRaycasting();
 
 
-    if (mixer_chamber) {
-        mixer_chamber.update(deltaTime);
+    if (mixer_agent1) {
+        mixer_agent1.update(deltaTime);
+    }
+    if (mixer_agent2) {
+        mixer_agent2.update(deltaTime);
+    }
+    if (mixer_agent3) {
+        mixer_agent3.update(deltaTime);
+    }
+    if (mixer_agent4) {
+        mixer_agent4.update(deltaTime);
     }
     if (mixer_wallgun1) {
         mixer_wallgun1.update(deltaTime);
